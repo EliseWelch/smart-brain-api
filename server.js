@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt-nodejs');
-const cors = require('cors');
-const knex = require('knex');
-const register = require('./controllers/register');
-const signin = require('./controllers/signin');
-const profile = require('./controllers/profile');
-const image = require('./controllers/image');
+import express from 'express';
+import { json } from 'body-parser';
+import bcrypt from 'bcrypt-nodejs';
+import cors from 'cors';
+import knex from 'knex';
+import { handleRegister } from './controllers/register';
+import { handleSignin } from './controllers/signin';
+import { handleProfile } from './controllers/profile';
+import { handleImage, handleApiCall } from './controllers/image';
 
 const db = knex({
     client: 'pg',
@@ -17,16 +17,16 @@ const db = knex({
 });
 
 const app = express();
-app.use(bodyParser.json());
+app.use(json());
 app.use(cors());
 
 app.get('/', (req, res) => { res.send("it worked!") })
 
-app.post('/signin', signin.handleSignin(db, bcrypt))
-app.post('/register', register.handleRegister(db, bcrypt))
-app.get('/profile/:id', profile.handleProfile(db))
-app.put('/image', image.handleImage(db))
-app.post('/imageurl', (req, res) => { image.handleApiCall(req, res) })
+app.post('/signin', handleSignin(db, bcrypt))
+app.post('/register', handleRegister(db, bcrypt))
+app.get('/profile/:id', handleProfile(db))
+app.put('/image', handleImage(db))
+app.post('/imageurl', (req, res) => { handleApiCall(req, res) })
 
 app.listen(process.env.PORT || 3000, () =>{
     console.log(`app is running on port ${process.env.PORT}`);
